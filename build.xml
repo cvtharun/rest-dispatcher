@@ -1,0 +1,25 @@
+<project name="RestDispatcher" default="compile" basedir="." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:x-schemas-db-com:_infrastructure/build/ant-1.6.5.xsd">
+	<property name="src" value="./src" />
+	<property name="lib" value="./lib" />	
+	<property name="classes" value="./classes" />
+
+	<path id="classpath">
+		<pathelement location="${classes}" />
+		<fileset dir="${lib}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="compile">
+		<delete dir="${classes}" />
+		<mkdir dir="${classes}" />
+		<javac srcdir="${src}/restdisp" destdir="${classes}" debug="on" classpathref="classpath" />
+		<copy todir="${classes}">
+            <fileset dir="${src}" includes="**/*.java">
+				<exclude name="tests/**"/>  
+            </fileset>
+        </copy>
+		<jar destfile="restdisp.jar" basedir="${classes}"/>
+		<delete dir="${classes}" />
+	</target>
+</project>
