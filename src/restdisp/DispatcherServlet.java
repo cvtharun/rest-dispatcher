@@ -2,8 +2,8 @@ package restdisp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Logger;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,8 +40,11 @@ public class DispatcherServlet extends HttpServlet {
 	}
 	
 	@Override
-	public void init(ServletConfig config) throws ServletException {
-		final String configName = config.getInitParameter("router.conf");
+	public void init() throws ServletException {
+		super.init();
+		Logger log = Logger.getLogger(this.getClass().getName());		
+		final String configName = getServletConfig().getInitParameter("router.conf");
+		log.info(String.format("Loading dispatcher config [%s]", configName));
 		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(configName);
 		try {
 			urlTree = UrlTreeBuilder.buildUrlTree(is);
