@@ -1,4 +1,4 @@
-package tests;
+package test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -22,25 +22,11 @@ public class TestTree {
 		long strt = System.currentTimeMillis();
 		long end = 0;
 		
-		// w127995mps
 		int i = 0;
-		for (; i < 50000; i++) {
-			res = LookupTree.getPath(root, "GET", "/web/add/1/456");
+		for (; i < 1; i++) {
+			res = LookupTree.getPath(root, "post", "/svc/act/1/2/3");
 			TreeExecutor.exec(res, null, null);
 		
-			res = LookupTree.getPath(root, "post", "/web/add/1/456");
-			TreeExecutor.exec(res, null, null);
-			
-			res = LookupTree.getPath(root, "post", "/web");
-			TreeExecutor.exec(res, null, null);
-			
-			res = LookupTree.getPath(root, "POST", "/web/");
-			TreeExecutor.exec(res, null, null);
-		
-			res = LookupTree.getPath(root, "get", "/123/456");
-			TreeExecutor.exec(res, null, null);
-			
-			end = System.currentTimeMillis();
 			if (end - strt > 1000) {
 				break;
 			}
