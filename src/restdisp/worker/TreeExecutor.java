@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,7 +15,7 @@ import restdisp.validation.HandlerException;
 
 public class TreeExecutor {
 	public static void exec(UrlDescriptor urlDescriptior, HttpServletRequest req, HttpServletResponse rsp) throws RoutingException, HandlerException {
-		Map<String, String> urlVariables = urlDescriptior.getUrlVariables();
+		List<String> urlVariables = urlDescriptior.getUrlVariables();
 		Leaf leaf = urlDescriptior.getLeaf();
 		
 		AbstractWorker abstractWorker;
@@ -41,8 +40,8 @@ public class TreeExecutor {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static Object[] getVariables(Map<String, String> map, Method meth, String className) throws RoutingException {
-		if (null == map) {
+	private static Object[] getVariables(List<String> list, Method meth, String className) throws RoutingException {
+		if (null == list) {
 			return new Object[0];
 		}
 		
@@ -50,8 +49,8 @@ public class TreeExecutor {
 		@SuppressWarnings("rawtypes")
 		Class[] tps = meth.getParameterTypes();
 		List<Object> lst = new ArrayList<Object>();
-		for (Map.Entry<String, String> item : map.entrySet()) {
-			String val = item.getValue();
+		for (String item : list) {
+			String val = item;
 			try {
 				if (tps[cnt].isAssignableFrom(int.class)) {
 					lst.add(Integer.parseInt(val));
@@ -66,7 +65,7 @@ public class TreeExecutor {
 				}
 				cnt++;
 			} catch (NumberFormatException e) {
-				throw new RoutingException(String.format("Failed to cast: %s => %s [%s:%s()]", item.getValue(), tps[cnt].getName(), className, meth.getName()));
+				throw new RoutingException(String.format("Failed to cast: %s => %s [%s:%s()]", item, tps[cnt].getName(), className, meth.getName()));
 			}
 		}
 		return lst.toArray();

@@ -1,17 +1,17 @@
 package restdisp.urltree;
 
-import java.util.Map;
+import java.util.List;
 
 public class UrlDescriptor {
-	private Map<String, String> urlVariables;
+	private List<String> urlVariables;
 	private Leaf leaf;
 	
-	public UrlDescriptor(Map<String, String> urlVariables, Leaf leaf) {
+	public UrlDescriptor(List<String> urlVariables, Leaf leaf) {
 		this.urlVariables = urlVariables;
 		this.leaf = leaf;
 	}
 	
-	public Map<String, String> getUrlVariables() {
+	public List<String> getUrlVariables() {
 		return urlVariables;
 	}
 	

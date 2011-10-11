@@ -20,22 +20,22 @@ public class BasicTest extends TestCase {
 	public void testLookup() throws IOException, RoutingException, HandlerException {
 		MockHelper mock = MockHelper.buildMock();
 		UrlDescriptor res = LookupTree.getPath(root, "post", "/svc/act/Tarokun/1/2");
-		TreeExecutor.exec(res, null, mock.getMockRsp());
+		TreeExecutor.exec(res, null, mock.getMock());
 		assertEquals("Tarokun12", mock.getResult());
 		
 		mock = MockHelper.buildMock();
 		res = LookupTree.getPath(root, "get", "/svc/act/123");
-		TreeExecutor.exec(res, null, mock.getMockRsp());
+		TreeExecutor.exec(res, null, mock.getMock());
 		assertEquals("123", mock.getResult());
 		
 		mock = MockHelper.buildMock();
 		res = LookupTree.getPath(root, "delete", "/svc/act/567");
-		TreeExecutor.exec(res, null, mock.getMockRsp());
+		TreeExecutor.exec(res, null, mock.getMock());
 		assertEquals("567", mock.getResult());
 		
 		mock = MockHelper.buildMock();
 		res = LookupTree.getPath(root, "get", "/svc/act");
-		TreeExecutor.exec(res, null, mock.getMockRsp());
+		TreeExecutor.exec(res, null, mock.getMock());
 		assertEquals("dummy", mock.getResult());
 	}
 }

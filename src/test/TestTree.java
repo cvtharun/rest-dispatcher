@@ -1,4 +1,5 @@
 package test;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -14,8 +15,8 @@ import restdisp.validation.RoutingException;
 import restdisp.worker.TreeExecutor;
 
 public class TestTree {
-	public static void main(String... args) throws IOException, SecurityException, ClassNotFoundException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, ConfigurationException, RoutingException, HandlerException {
-		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("router.conf");
+	public static void main(String... args) throws IOException, SecurityException, ClassNotFoundException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, ConfigurationException, RoutingException, HandlerException, InterruptedException {
+		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.conf");
 		Node root = UrlTreeBuilder.buildUrlTree(is);
 		
 		UrlDescriptor res = null;
@@ -23,16 +24,16 @@ public class TestTree {
 		long end = 0;
 		
 		int i = 0;
-		for (; i < 1; i++) {
-			res = LookupTree.getPath(root, "post", "/svc/act/1/2/3");
+		for (; i < 500000000; i++) {
+			res = LookupTree.getPath(root, "post", "/svc/act/1/2/3/a/b/c/d/e/4/5/6");
 			TreeExecutor.exec(res, null, null);
-		
+			
+			end = System.currentTimeMillis();
 			if (end - strt > 1000) {
 				break;
 			}
 		}
 		end = System.currentTimeMillis();
-		i *= 5;
 		System.out.format("%d %d", i, (end - strt));
 	}
 	

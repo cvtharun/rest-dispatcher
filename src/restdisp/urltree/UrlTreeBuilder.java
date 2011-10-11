@@ -49,46 +49,46 @@ public class UrlTreeBuilder {
 	}
 
 	private static void addBranchToTree(Node root, String[] nodes, String classAndMethod) throws ConfigurationException {
-		try {
-			String[] classAndMethodArr = classAndMethod.split("\\:");
-			List<Node> children = root.getChildren();
-			i: for (int i = 0; i < nodes.length; i++) {
-				Node tmpNode = new Node(getVarname(nodes[i]));
-				
-				if (!children.contains(tmpNode)) {
-					children.add(tmpNode);
-					tmpNode.setVar(isVar(nodes[i]));
-					children = new ArrayList<Node>();
-					tmpNode.setChildren(children);
-					if (i + 1 == nodes.length){
-						tmpNode.setLeaf(buildLeaf(classAndMethodArr, nodes));
-					}
-				} else {
-					for (Node node : children) {
-						if (node.equals(tmpNode)) {
-							if (i + 1 == nodes.length && node.getLeaf() == null) {
-								node.setLeaf(buildLeaf(classAndMethodArr, nodes));
-							}
-							children = node.getChildren();
-							continue i;
+		String[] classAndMethodArr = classAndMethod.split("\\:");
+		List<Node> children = root.getChildren();
+		i: for (int i = 0; i < nodes.length; i++) {
+			Node tmpNode = new Node(getVarname(nodes[i]));
+			
+			if (!children.contains(tmpNode)) {
+				children.add(tmpNode);
+				tmpNode.setVar(isVar(nodes[i]));
+				children = new ArrayList<Node>();
+				tmpNode.setChildren(children);
+				if (i + 1 == nodes.length){
+					tmpNode.setLeaf(buildLeaf(classAndMethodArr, nodes));
+				}
+			} else {
+				for (Node node : children) {
+					if (node.equals(tmpNode)) {
+						if (i + 1 == nodes.length && node.getLeaf() == null) {
+							node.setLeaf(buildLeaf(classAndMethodArr, nodes));
 						}
+						children = node.getChildren();
+						continue i;
 					}
 				}
 			}
-		} catch (ClassNotFoundException e) {
-			throw new ConfigurationException("Failed to add branch. Class not found.", e);
-		} catch (NoSuchMethodException e) {
-			throw new ConfigurationException("Failed to add branch. Method not found.", e);
 		}
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static Leaf buildLeaf(String[] classAndMethodArr, String[] nodes) throws ClassNotFoundException, NoSuchMethodException, ConfigurationException {
-		Class cls = Class.forName(classAndMethodArr[0]);
-		Constructor constructor = cls.getConstructor(HttpServletRequest.class, HttpServletResponse.class);
-		int varCnt = getVariableCount(nodes);
-		Method meth = getMethod(cls, classAndMethodArr[1], varCnt);
-		return new Leaf(cls, constructor, meth);
+	private static Leaf buildLeaf(String[] classAndMethodArr, String[] nodes) throws ConfigurationException {
+		try {
+			Class cls = Class.forName(classAndMethodArr[0]);
+			Constructor constructor = cls.getConstructor(HttpServletRequest.class, HttpServletResponse.class);
+			int varCnt = getVariableCount(nodes);
+			Method meth = getMethod(cls, classAndMethodArr[1], varCnt);
+			return new Leaf(cls, constructor, meth);
+		} catch (ClassNotFoundException e) {
+			throw new ConfigurationException(String.format("Failed to build leaf. Class not found [%s].", classAndMethodArr[0]), e);
+		} catch (NoSuchMethodException e) {
+			throw new ConfigurationException(String.format("Failed to build leaf. Method not found [%s:%s].", classAndMethodArr[0], classAndMethodArr[1]), e);
+		}
 	}
 	
 	private static int getVariableCount(String[] nodes) {

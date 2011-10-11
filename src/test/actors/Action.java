@@ -1,4 +1,4 @@
-package test;
+package test.actors;
 
 import java.io.IOException;
 
@@ -10,6 +10,11 @@ import restdisp.worker.AbstractWorker;
 public class Action extends AbstractWorker  {
 	public Action(HttpServletRequest req, HttpServletResponse rsp) {
 		super(req, rsp);
+	}
+	
+	public void highLoad(String name, long id, int cardId, String val, Long lon, Integer intgr) throws IOException {
+//		System.out.println("addUser: " + name);
+//		getResponse().getWriter().write(name + id + cardId);
 	}
 	
 	public void addUser(String name, long id, int cardId) throws IOException {

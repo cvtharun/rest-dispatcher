@@ -12,23 +12,23 @@ import javax.servlet.http.HttpServletResponse;
 
 public class MockHelper {
 	private ByteArrayOutputStream baos;
-	private HttpServletResponse mockRsp;
+	private HttpServletResponse mock;
 	
 	public MockHelper(ByteArrayOutputStream baos) {
 		this.baos = baos;
 	}
 	
-	public HttpServletResponse getMockRsp() {
-		return mockRsp;
+	public HttpServletResponse getMock() {
+		return mock;
 	}
 	
 	public String getResult() throws IOException {
-		mockRsp.getWriter().close();
+		mock.getWriter().close();
 		return new String(baos.toByteArray());
 	}
 	
 	public void setMockRsp(HttpServletResponse mockRsp) {
-		this.mockRsp = mockRsp;
+		this.mock = mockRsp;
 	}
 	
 	public static MockHelper buildMock() throws IOException {
