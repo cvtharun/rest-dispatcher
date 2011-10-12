@@ -4,19 +4,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public abstract class AbstractWorker {
-	private HttpServletRequest req;
-	private HttpServletResponse rsp;
-	
-	public AbstractWorker(HttpServletRequest req, HttpServletResponse rsp) {
-		this.req = req;
-		this.rsp = rsp;
-	}
+	private HttpServletRequest request;
+	private HttpServletResponse response;
 	
 	public HttpServletRequest getRequest() {
-		return req;
+		return request;
 	}
 	
 	public HttpServletResponse getResponse() {
-		return rsp;
+		return response;
+	}
+
+	void setRequest(HttpServletRequest request) {
+		this.request = request;
+	}
+
+	void setResponse(HttpServletResponse response) {
+		this.response = response;
 	}
 }

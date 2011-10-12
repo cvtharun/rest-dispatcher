@@ -2,16 +2,9 @@ package test.actors;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import restdisp.worker.AbstractWorker;
 
 public class Action extends AbstractWorker  {
-	public Action(HttpServletRequest req, HttpServletResponse rsp) {
-		super(req, rsp);
-	}
-	
 	public void highLoad(String name, long id, int cardId, String val, Long lon, Integer intgr) throws IOException {
 //		System.out.println("addUser: " + name);
 //		getResponse().getWriter().write(name + id + cardId);

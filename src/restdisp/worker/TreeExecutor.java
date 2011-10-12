@@ -20,7 +20,9 @@ public class TreeExecutor {
 		
 		AbstractWorker abstractWorker;
 		try {
-			abstractWorker = (AbstractWorker) leaf.getConstructor().newInstance(req, rsp);
+			abstractWorker = (AbstractWorker) leaf.getConstructor().newInstance();
+			abstractWorker.setRequest(req);
+			abstractWorker.setResponse(rsp);
 		} catch (InstantiationException e) {
 			throw new RoutingException(String.format("Failed to instantiate worker [%s]", leaf.getCls().getName()), e);
 		} catch (IllegalAccessException e) {

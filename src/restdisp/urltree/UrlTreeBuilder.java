@@ -7,9 +7,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import restdisp.io.IOUtil;
 import restdisp.validation.ConfigParser;
 import restdisp.validation.ConfigurationException;
@@ -80,7 +77,7 @@ public class UrlTreeBuilder {
 	private static Leaf buildLeaf(String[] classAndMethodArr, String[] nodes) throws ConfigurationException {
 		try {
 			Class cls = Class.forName(classAndMethodArr[0]);
-			Constructor constructor = cls.getConstructor(HttpServletRequest.class, HttpServletResponse.class);
+			Constructor constructor = cls.getConstructor();
 			int varCnt = getVariableCount(nodes);
 			Method meth = getMethod(cls, classAndMethodArr[1], varCnt);
 			return new Leaf(cls, constructor, meth);
