@@ -41,7 +41,7 @@ public class IOUtil {
 		try {
 			ps.close();
 			ous.close();
-			result = ous.toString("UTF-8");
+			result = ous.toString(ENCODING);
 		} catch (IOException e) {
 			result = "Failed to execute getStackTrace: " + e.toString();
 		}

@@ -32,16 +32,19 @@ public class UrlTreeBuilder {
 	
 	private static void addEntryToTree(Node root, String entry) throws ConfigurationException {
 		String[] items = entry.split(" ");
-		if (items.length != 3) {
-			throw new ConfigurationException(String.format("Wrong configuration entry [%s]", entry));
-		}
-		
-		items[1] = String.format("/%s%s", items[0], items[1]);
-		String[] nodes = items[1].replaceFirst("/", "").split("(?<=\\w|})/");
 		try {
+			if (items.length != 3) {
+				throw new ConfigurationException(String.format("Wrong configuration entry [%s]", entry));
+			}
+			ConfigParser.validateUrl(items[1]);
+			ConfigParser.validateMethod(items[0]);
+			
+			items[1] = String.format("/%s%s", items[0], items[1]);
+			String[] nodes = items[1].replaceFirst("/", "").split("(?<=\\w|})/");
+		
 			addBranchToTree(root, nodes, items[2]);
 		} catch (ConfigurationException e) {
-			throw new ConfigurationException(String.format("Failed to add branch [%s]", items[1]), e);
+			throw new ConfigurationException(String.format("Failed to add branch [%s]", entry), e);
 		}
 	}
 
@@ -84,7 +87,7 @@ public class UrlTreeBuilder {
 		} catch (ClassNotFoundException e) {
 			throw new ConfigurationException(String.format("Failed to build leaf. Class not found [%s].", classAndMethodArr[0]), e);
 		} catch (NoSuchMethodException e) {
-			throw new ConfigurationException(String.format("Failed to build leaf. Method not found [%s:%s].", classAndMethodArr[0], classAndMethodArr[1]), e);
+			throw new ConfigurationException(String.format("Failed to build leaf. Default constructor not found [%s].", classAndMethodArr[0]), e);
 		}
 	}
 	

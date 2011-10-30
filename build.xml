@@ -1,7 +1,8 @@
-<project name="RestDispatcher" default="compile" basedir="." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:x-schemas-db-com:_infrastructure/build/ant-1.6.5.xsd">
+<project name="RestDispatcher" default="buildjar" basedir="." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:x-schemas-db-com:_infrastructure/build/ant-1.6.5.xsd">
 	<property name="src" value="./src" />
-	<property name="lib" value="./lib" />	
+	<property name="lib" value="./lib" />
 	<property name="classes" value="./classes" />
+	<property name="test-reports" value="./test-reports" />
 
 	<path id="classpath">
 		<pathelement location="${classes}" />
@@ -13,13 +14,36 @@
 	<target name="compile">
 		<delete dir="${classes}" />
 		<mkdir dir="${classes}" />
-		<javac srcdir="${src}/restdisp" destdir="${classes}" debug="on" classpathref="classpath" />
+		<javac srcdir="${src}" destdir="${classes}" debug="on" classpathref="classpath" />
 		<copy todir="${classes}">
-            <fileset dir="${src}" includes="**/*.java">
-				<exclude name="tests/**"/>  
-            </fileset>
-        </copy>
-		<jar destfile="restdisp.jar" basedir="${classes}"/>
+			<fileset dir="${src}" includes="**/*.java">
+				<exclude name="test/**"/>
+			</fileset>
+		</copy>
+		<copy todir="${classes}/test/conf">
+			<fileset dir="${src}/test/conf" includes="**/*.conf" />
+		</copy>
+	</target>
+
+	<target name="run-test" depends="compile">
+		<delete dir="${test-reports}" />
+		<mkdir dir="${test-reports}" />
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<formatter type="xml" usefile="true" />
+			<batchtest fork="no" todir="${test-reports}">
+				<fileset dir="${classes}">
+					<include name="**/*Test*.class" />
+				</fileset>
+			</batchtest>
+			<classpath refid="classpath" />
+		</junit>
+	</target>
+
+	<target name="buildjar" depends="run-test">
+		<jar destfile="restdisp.jar" basedir="${classes}">
+			<exclude name="test/**"/>
+		</jar>
 		<delete dir="${classes}" />
+		<delete dir="${test-reports}" />
 	</target>
 </project>
