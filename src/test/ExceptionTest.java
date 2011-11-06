@@ -185,4 +185,19 @@ public class ExceptionTest {
 			assertTrue(inner2.getMessage().contains("For input string: \"1a\""));
 		}
 	}
+	
+	@Test
+	public void testCastCharacterException() throws ConfigurationException, IOException, RoutingException, restdisp.validation.HandlerException {
+		try {
+			UrlDescriptor res = LookupTree.getPath(root, "get", "/svc/act/true/true/1/1/256/256/c/ss");
+			TreeExecutor.exec(res, null, null);
+			assertTrue(false);
+		} catch (Exception e) {
+			Throwable inner = e.getCause();
+			Throwable inner2 = inner.getCause();
+			assertTrue(e.getMessage().contains("Failed to call method: [test.actors.Action:getShortTypes()]"));
+			assertTrue(inner.getMessage().contains("Failed to cast variable for method call: ['ss' => class java.lang.Character]"));
+			assertTrue(inner2.getMessage().contains("Failed to cast String to Character [ss]"));
+		}
+	}
 }

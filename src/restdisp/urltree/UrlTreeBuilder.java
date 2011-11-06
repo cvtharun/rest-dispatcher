@@ -76,14 +76,13 @@ public class UrlTreeBuilder {
 		}
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static Leaf buildLeaf(String[] classAndMethodArr, String[] nodes) throws ConfigurationException {
 		try {
-			Class cls = Class.forName(classAndMethodArr[0]);
-			Constructor constructor = cls.getConstructor();
+			Class<?> cls = Class.forName(classAndMethodArr[0]);
+			Constructor<?> constructor = cls.getConstructor();
 			int varCnt = getVariableCount(nodes);
 			Method meth = getMethod(cls, classAndMethodArr[1], varCnt);
-			return new Leaf(cls, constructor, meth);
+			return new Leaf(cls, constructor, meth, Casters.getCasters(meth));
 		} catch (ClassNotFoundException e) {
 			throw new ConfigurationException(String.format("Failed to build leaf. Class not found [%s].", classAndMethodArr[0]), e);
 		} catch (NoSuchMethodException e) {
@@ -101,8 +100,7 @@ public class UrlTreeBuilder {
 		return cnt;
 	}
 	
-	@SuppressWarnings("rawtypes") 
-	private static Method getMethod(Class cls, String methodName, int varCnt) throws ConfigurationException {
+	private static Method getMethod(Class<?> cls, String methodName, int varCnt) throws ConfigurationException {
 		Method meth = null;
 		Method[] mths = cls.getMethods();
 		for (Method curMet : mths) {

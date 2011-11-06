@@ -2,7 +2,6 @@ package restdisp.worker;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +32,7 @@ public class TreeExecutor {
 		
 		Object[] vars;
 		try {
-			vars = getVariables(urlVariables, leaf.getMeth());
+			vars = getVariables(urlVariables, leaf.getMeth(), leaf.getCasters());
 		} catch (RoutingException e) {
 			throw new RoutingException(String.format("Failed to call method: [%s:%s()]", leaf.getCls().getName(), leaf.getMeth().getName()), e);
 		}
@@ -46,49 +45,22 @@ public class TreeExecutor {
 		}
 	}
 	
-	@SuppressWarnings({"rawtypes"})
-	private static Object[] getVariables(List<String> list, Method meth) throws RoutingException {
+	private static Object[] getVariables(List<String> list, Method meth, ArgCaster[] casters) throws RoutingException {
 		if (null == list) {
 			return new Object[0];
 		}
 		
+		Object[] res = new Object[list.size()];
 		int cnt = 0;
-		Class[] tps = meth.getParameterTypes();
-		List<Object> lst = new ArrayList<Object>();
 		for (String item : list) {
-			String val = item;
-			Class cls = tps[cnt];
 			try {
-				if (cls == boolean.class || cls == Boolean.class) {
-					lst.add(Boolean.parseBoolean(val));
-				} else if (cls == byte.class || cls == Byte.class) {
-					lst.add(Byte.parseByte(val));
-				} else if (cls == short.class || cls == Short.class) {
-					lst.add(Short.parseShort(val));
-				} else if (cls == char.class || cls == Character.class) {
-					if (val.length() == 1) {
-						lst.add(val.charAt(0));
-					} else {
-						throw new RoutingException(String.format("Failed to cast String to Character [%s]", val));
-					}
-				} else if (cls == int.class || cls == Integer.class) {
-					lst.add(Integer.parseInt(val));
-				} else if (cls == long.class || cls == Long.class) {
-					lst.add(Long.parseLong(val));
-				} else if (cls == float.class || cls == Float.class) {
-					lst.add(Float.parseFloat(val));
-				} else if (cls == double.class || cls == Double.class) {
-					lst.add(Double.parseDouble(val));
-				} else if (cls == String.class) {
-					lst.add(val);
-				} else {
-					throw new RoutingException(String.format("Unsupported class detected [%s]", cls.getName()));
-				}
+				res[cnt] = casters[cnt].cast(item);
 				cnt++;
 			} catch (Exception e) {
-				throw new RoutingException(String.format("Failed to cast variable for method call: ['%1$s' => %2$s]", item, cls.getName()), e);
+				Class<?>[] tps = meth.getParameterTypes();
+				throw new RoutingException(String.format("Failed to cast variable for method call: ['%1$s' => %2$s]", item, tps[cnt]), e);
 			}
 		}
-		return lst.toArray();
+		return res;
 	}
 }
