@@ -1,10 +1,26 @@
 package restdisp.validation;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class ConfigParser {
+	private static final Set<Class<?>> supportedArgs = new HashSet<Class<?>>();
+	static {
+		supportedArgs.add(boolean.class); supportedArgs.add(Boolean.class);
+		supportedArgs.add(byte.class); supportedArgs.add(Byte.class);
+		supportedArgs.add(char.class); supportedArgs.add(Character.class);
+		supportedArgs.add(short.class); supportedArgs.add(Short.class);
+		supportedArgs.add(int.class); supportedArgs.add(Integer.class);
+		supportedArgs.add(long.class); supportedArgs.add(Long.class);
+		supportedArgs.add(float.class); supportedArgs.add(Float.class);
+		supportedArgs.add(double.class); supportedArgs.add(Double.class);
+		supportedArgs.add(String.class);
+	}
+
 	public static String[] parse(String conf) {
 		conf = conf.replaceAll("\r", "");
-		conf = conf.replaceAll("[\\s&&[^\\n]]+", " "); // skip extra spaces
-		conf = conf.replaceAll("^[\\s]+|[\\s]+$", ""); // trim spaces
+		conf = conf.replaceAll("[\\s&&[^\\n]]+", " "); // trim spaces inside entry
+		conf = conf.replaceAll("(?<=\n)[\\s]+", ""); // trim spaces before entry
 		String[] strEntries = conf.split("\n");
 		return strEntries;
 	}
@@ -32,6 +48,14 @@ public class ConfigParser {
 	private static void assertEquals(String str1, String str2) throws ConfigurationException {
 		if (!str1.equals(str2)) {
 			throw new ConfigurationException(String.format("Got [%s] while expected [%s]", str1, str2));
+		}
+	}
+
+	public static void validateMethArgs(Class<?>[] parameterTypes) throws ConfigurationException {
+		for (Class<?> clazz : parameterTypes) {
+			if (!supportedArgs.contains(clazz)) {
+				throw new ConfigurationException(String.format("Unsupported argument type [%s]", clazz.getName()));
+			}
 		}
 	}
 }

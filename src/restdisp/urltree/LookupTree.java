@@ -48,7 +48,11 @@ public class LookupTree {
 	
 	private static FetchResult getUrlPath(Node root, String[] nodes, int lvl) {
 		if (nodes.length == lvl) { // reached the leaf
-			return new FetchResult(true, null, root.getLeaf());
+			if (root.getLeaf() != null) {
+				return new FetchResult(true, null, root.getLeaf());
+			} else {
+				return new FetchResult(false, null);
+			}
 		}
 		
 		String curNode = nodes[lvl];

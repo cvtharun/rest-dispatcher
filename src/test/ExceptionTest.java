@@ -11,7 +11,6 @@ import restdisp.validation.HandlerException;
 import restdisp.validation.RoutingException;
 import restdisp.validation.ConfigurationException;
 import restdisp.worker.TreeExecutor;
-import test.MockHelper;
 import static org.junit.Assert.*; 
 
 import org.junit.Test;
@@ -24,9 +23,8 @@ public class ExceptionTest {
 	@Test
 	public void testHandlerException() throws ConfigurationException, IOException, RoutingException, restdisp.validation.HandlerException {
 		try {
-			MockHelper mock = MockHelper.buildMock();
 			UrlDescriptor res = LookupTree.getPath(root, "get", "/svc/exc");
-			TreeExecutor.exec(res, null, mock.getMock());
+			TreeExecutor.exec(res, null, null);
 			assertTrue(false);
 		} catch (HandlerException e) {
 			assertTrue(e.getMessage().contains("Handler invocation exception [test.actors.Action:getException]. Variables count [0]."));
@@ -154,6 +152,37 @@ public class ExceptionTest {
 			assertTrue(false);
 		} catch (HandlerException e) {
 			assertTrue(e.getMessage().contains("Constructor invocation exception [test.actors.ConstructorException]"));
+		}
+	}
+	
+	@Test
+	public void testWrongArgsException() throws ConfigurationException, IOException, RoutingException, HandlerException {
+		try {
+			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.wrongargs.conf");
+			@SuppressWarnings("unused")
+			Node root = UrlTreeBuilder.buildUrlTree(is);
+			assertTrue(false);
+		} catch (ConfigurationException e) {
+			Throwable inner = e.getCause();
+			Throwable inner2 = inner.getCause();
+			assertTrue(e.getMessage().contains("Failed to add branch [get /svc/exc/{id} test.actors.WrongArgs:test]"));
+			assertTrue(inner.getMessage().contains("Class method has unsupported argument [test.actors.WrongArgs.test]"));
+			assertTrue(inner2.getMessage().contains("Unsupported argument type [java.util.Arrays]"));
+		}
+	}
+	
+	@Test
+	public void testCastException() throws ConfigurationException, IOException, RoutingException, restdisp.validation.HandlerException {
+		try {
+			UrlDescriptor res = LookupTree.getPath(root, "get", "/svc/act/1a");
+			TreeExecutor.exec(res, null, null);
+			assertTrue(false);
+		} catch (Exception e) {
+			Throwable inner = e.getCause();
+			Throwable inner2 = inner.getCause();
+			assertTrue(e.getMessage().contains("Failed to call method: [test.actors.Action:getUser()]"));
+			assertTrue(inner.getMessage().contains("Failed to cast variable for method call: ['1a' => int]"));
+			assertTrue(inner2.getMessage().contains("For input string: \"1a\""));
 		}
 	}
 }

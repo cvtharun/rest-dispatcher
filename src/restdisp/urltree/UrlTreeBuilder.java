@@ -108,12 +108,20 @@ public class UrlTreeBuilder {
 		for (Method curMet : mths) {
 			if (curMet.getName().equals(methodName) && curMet.getParameterTypes().length == varCnt) {
 				meth = curMet;
+				break;
 			}
 		}
 		
 		if (null == meth) {
 			throw new ConfigurationException(String.format("Method not found [%s:%s]. Variables count [%s].", cls.toString(), methodName, varCnt));
 		}
+		
+		try {
+			ConfigParser.validateMethArgs(meth.getParameterTypes());
+		} catch (ConfigurationException e) {
+			throw new ConfigurationException(String.format("Class method has unsupported argument [%s.%s]", cls.getName(), methodName), e);
+		}
+		
 		return meth;
 	}
 

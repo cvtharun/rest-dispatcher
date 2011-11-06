@@ -20,6 +20,24 @@ public class Action extends AbstractWorker  {
 		getResponse().getWriter().write("" + id);
 	}
 	
+	public void getFloatingPoint(float a, double b, Float c, Double d) throws IOException {
+		Long res = Math.round(a + b + c + d);
+		System.out.println("getFloatingPoint: " + res);
+		getResponse().getWriter().write("fp" + res.toString());
+	}
+	
+	public void getShortTypes(boolean a, Boolean b, byte c, Byte d, short e, Short f, char g, Character h) throws IOException {
+		String str = "st" + a + b + c + d + e + f + g + h;
+		System.out.println("getShortTypes: " + str);
+		getResponse().getWriter().write(str);
+	}
+	
+	public void getLongTypes(int a, Integer b, long c, Long d) throws IOException {
+		String str = "lt" + a + b + c + d;
+		System.out.println("getLongTypes: " + str);
+		getResponse().getWriter().write(str);
+	}
+	
 	public void removeUser(int id) throws IOException {
 		System.out.println("removeUser: " + id);
 		getResponse().getWriter().write("" + id);

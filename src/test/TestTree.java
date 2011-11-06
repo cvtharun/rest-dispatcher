@@ -5,11 +5,10 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 
 import junit.framework.TestCase;
-
 import restdisp.urltree.LookupTree;
 import restdisp.urltree.Node;
-import restdisp.urltree.UrlTreeBuilder;
 import restdisp.urltree.UrlDescriptor;
+import restdisp.urltree.UrlTreeBuilder;
 import restdisp.validation.ConfigurationException;
 import restdisp.validation.HandlerException;
 import restdisp.validation.RoutingException;

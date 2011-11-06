@@ -37,5 +37,20 @@ public class BasicTest extends TestCase {
 		res = LookupTree.getPath(root, "get", "/svc/act");
 		TreeExecutor.exec(res, null, mock.getMock());
 		assertEquals("dummy", mock.getResult());
+		
+		mock = MockHelper.buildMock();
+		res = LookupTree.getPath(root, "get", "/svc/act/1.1/1.2/1.3/1.4");
+		TreeExecutor.exec(res, null, mock.getMock());
+		assertEquals("fp5", mock.getResult());
+		
+		mock = MockHelper.buildMock();
+		res = LookupTree.getPath(root, "get", "/svc/act/true/true/1/1/256/256/c/s");
+		TreeExecutor.exec(res, null, mock.getMock());
+		assertEquals("sttruetrue11256256cs", mock.getResult());
+		
+		mock = MockHelper.buildMock();
+		res = LookupTree.getPath(root, "get", "/svc/act/lt/1/2/3/4");
+		TreeExecutor.exec(res, null, mock.getMock());
+		assertEquals("lt1234", mock.getResult());
 	}
 }
