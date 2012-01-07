@@ -37,19 +37,23 @@ public class UrlTreeBuilder {
 				throw new ConfigurationException(String.format("Wrong configuration entry [%s]", entry));
 			}
 			ConfigParser.validateUrl(items[1]);
-			ConfigParser.validateMethod(items[0]);
+			ConfigParser.validateHttpMethod(items[0]);
 			
 			items[1] = String.format("/%s%s", items[0], items[1]);
 			String[] nodes = items[1].replaceFirst("/", "").split("(?<=\\w|})/");
+			
+			String[] classAndMethodArr = items[2].split("\\:");
+			if (classAndMethodArr.length != 2) {
+				throw new ConfigurationException(String.format("Wrong class method entry [%s]", entry));
+			}
 		
-			addBranchToTree(root, nodes, items[2]);
+			addBranchToTree(root, nodes, classAndMethodArr);
 		} catch (ConfigurationException e) {
 			throw new ConfigurationException(String.format("Failed to add branch [%s]", entry), e);
 		}
 	}
 
-	private static void addBranchToTree(Node root, String[] nodes, String classAndMethod) throws ConfigurationException {
-		String[] classAndMethodArr = classAndMethod.split("\\:");
+	private static void addBranchToTree(Node root, String[] nodes, String[] classAndMethodArr) throws ConfigurationException {
 		List<Node> children = root.getChildren();
 		i: for (int i = 0; i < nodes.length; i++) {
 			Node tmpNode = new Node(getVarname(nodes[i]));

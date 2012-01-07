@@ -30,7 +30,7 @@ public class ConfigParser {
 			String[] elems = url.split("/");
 			assertEquals(elems[0], "");
 			for (int cnt = 1; cnt < elems.length; cnt++) {
-				if (!elems[cnt].matches("^\\{.+\\}$") && !elems[cnt].matches("^(?!\\{).+(?<!\\})$")) {
+				if (!elems[cnt].matches("^\\{.+\\}$") && !elems[cnt].matches("^(?!\\{).+(?<!\\})$")) { // if not match elems with or without braces
 					throw new ConfigurationException(String.format("Wrong value [%s]", elems[cnt]));
 				}
 			}
@@ -39,7 +39,7 @@ public class ConfigParser {
 		}
 	}
 	
-	public static void validateMethod(String meth) throws ConfigurationException {
+	public static void validateHttpMethod(String meth) throws ConfigurationException {
 		if (!meth.equalsIgnoreCase("get") && !meth.equalsIgnoreCase("post") && !meth.equalsIgnoreCase("put") && !meth.equalsIgnoreCase("delete")){
 			throw new ConfigurationException(String.format("Wrong method [%s]", meth));
 		}

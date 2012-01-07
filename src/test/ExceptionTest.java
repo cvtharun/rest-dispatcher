@@ -200,4 +200,18 @@ public class ExceptionTest {
 			assertTrue(inner2.getMessage().contains("Failed to cast String to Character [ss]"));
 		}
 	}
+	
+	@Test
+	public void testWrongWorkerMethodException() throws ConfigurationException, IOException, RoutingException, restdisp.validation.HandlerException {
+		try {
+			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.wrongworkermethod.conf");
+			@SuppressWarnings("unused")
+			Node root = UrlTreeBuilder.buildUrlTree(is);
+			assertTrue(false);
+		} catch (ConfigurationException e) {
+			ConfigurationException inner = (ConfigurationException) e.getCause();
+			assertTrue(e.getMessage().contains("Failed to add branch [get /svc/act test.actors.Action]"));
+			assertTrue(inner.getMessage().contains("Wrong class method entry [get /svc/act test.actors.Action]"));
+		}
+	}
 }
