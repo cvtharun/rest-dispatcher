@@ -12,12 +12,12 @@ public class Action extends AbstractWorker  {
 	
 	public void addUser(String name, long id, int cardId) throws IOException {
 		System.out.println("addUser: " + name);
-		getResponse().getWriter().write(name + id + cardId);
+		setPayload(name + id + cardId);
 	}
 	
 	public void getUser(int id) throws IOException {
 		System.out.println("getUser: " + id);
-		getResponse().getWriter().write("" + id);
+		setPayload("" + id, "UTF-8");
 	}
 	
 	public void getFloatingPoint(float a, double b, Float c, Double d) throws IOException {

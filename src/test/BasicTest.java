@@ -10,6 +10,7 @@ import restdisp.urltree.UrlTreeBuilder;
 import restdisp.validation.HandlerException;
 import restdisp.validation.RoutingException;
 import restdisp.worker.TreeExecutor;
+import test.mock.MockHelper;
 import junit.framework.TestCase;
 
 public class BasicTest extends TestCase {
@@ -18,12 +19,12 @@ public class BasicTest extends TestCase {
 	public BasicTest() throws Exception {}
 	
 	public void testLookup() throws IOException, RoutingException, HandlerException {
-		MockHelper mock = MockHelper.buildMock();
+		MockHelper mock = MockHelper.buildStreamMock();
 		UrlDescriptor res = LookupTree.getPath(root, "post", "/svc/act/Tarokun/1/2");
 		TreeExecutor.exec(res, null, mock.getMock());
 		assertEquals("Tarokun12", mock.getResult());
 		
-		mock = MockHelper.buildMock();
+		mock = MockHelper.buildStreamMock();
 		res = LookupTree.getPath(root, "get", "/svc/act/123");
 		TreeExecutor.exec(res, null, mock.getMock());
 		assertEquals("123", mock.getResult());

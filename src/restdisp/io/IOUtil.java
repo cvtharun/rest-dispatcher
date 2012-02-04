@@ -7,7 +7,7 @@ import java.io.PrintStream;
 
 public class IOUtil {
 	private static final int BUF_SIZE = 1024;
-	private static final String ENCODING = "UTF-8";
+	private static final String DEF_ENCODING = "UTF-8";
 
 	public static byte[] readStream(final InputStream is) throws IOException {
 		byte buf[] = new byte[BUF_SIZE];
@@ -29,8 +29,12 @@ public class IOUtil {
 	}
 
 	public static String toString(final InputStream is) throws IOException {
+		return toString(is, DEF_ENCODING);
+	}
+	
+	public static String toString(final InputStream is, String encoding) throws IOException {
 		byte[] buf = readStream(is);
-		return new String(buf, ENCODING);
+		return new String(buf, encoding);
 	}
 	
 	public static String getStackTrace(Throwable exc) {
@@ -41,7 +45,7 @@ public class IOUtil {
 		try {
 			ps.close();
 			ous.close();
-			result = ous.toString(ENCODING);
+			result = ous.toString(DEF_ENCODING);
 		} catch (IOException e) {
 			result = "Failed to execute getStackTrace: " + e.toString();
 		}
