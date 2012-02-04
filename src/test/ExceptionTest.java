@@ -35,7 +35,6 @@ public class ExceptionTest {
 	@SuppressWarnings("unused")
 	public void testRoutingException() throws ConfigurationException, IOException, RoutingException, restdisp.validation.HandlerException {
 		try {
-			MockHelper mock = MockHelper.buildMock();
 			UrlDescriptor res = LookupTree.getPath(root, "get", "/svc/exc/tst");
 			assertTrue(false);
 		} catch (RoutingException e) {
