@@ -42,6 +42,7 @@
 	<target name="buildjar" depends="run-test">
 		<jar destfile="restdisp.jar" basedir="${classes}">
 			<exclude name="test/**"/>
+			<exclude name="**/*.java"/>
 		</jar>
 		<delete dir="${classes}" />
 		<delete dir="${test-reports}" />
