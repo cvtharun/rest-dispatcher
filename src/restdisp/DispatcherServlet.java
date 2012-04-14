@@ -46,6 +46,11 @@ public class DispatcherServlet extends HttpServlet {
 		final String configName = getServletConfig().getInitParameter("router.conf");
 		log.info(String.format("Loading dispatcher config [%s]", configName));
 		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(configName);
+		
+		if (is == null) {
+			throw new ServletException(String.format("Configuration not found [%s]", configName));
+		}
+		
 		try {
 			urlTree = UrlTreeBuilder.buildUrlTree(is);
 		} catch (ConfigurationException e) {
