@@ -271,4 +271,17 @@ public class ExceptionTest {
 			assertTrue(inner3.getMessage().contains("Wrong value [{id]"));
 		}
 	}
+	
+	@Test
+	public void testWrongConfPathException() throws ConfigurationException, IOException, RoutingException, restdisp.validation.HandlerException {
+		try {
+			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.conf");
+			is.close();
+			@SuppressWarnings("unused")
+			Node root = UrlTreeBuilder.buildUrlTree(is);
+			assertTrue(false);
+		} catch (ConfigurationException e) {
+			assertTrue(e.getMessage().contains("Could not read stream"));
+		}
+	}
 }

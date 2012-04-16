@@ -4,28 +4,36 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 
 public class IOUtil {
 	private static final int BUF_SIZE = 1024;
 	private static final String DEF_ENCODING = "UTF-8";
 
 	public static byte[] readStream(final InputStream is) throws IOException {
-		byte buf[] = new byte[BUF_SIZE];
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		try {
+			byte buf[] = new byte[BUF_SIZE];
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-		int read = 0;
-		do {
-			read = is.read(buf, 0, BUF_SIZE);
-			if (read > 0) {
-				bos.write(buf, 0, read);
+			int read = 0;
+			do {
+				read = is.read(buf, 0, BUF_SIZE);
+				if (read > 0) {
+					bos.write(buf, 0, read);
+				}
+			} while (read > 0);
+
+			byte[] result = bos.toByteArray();
+			return result;
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 			}
-		} while (read > 0);
-
-		bos.flush();
-		byte[] result = bos.toByteArray();
-		bos.close();
-
-		return result;
+		}
 	}
 
 	public static String toString(final InputStream is) throws IOException {
@@ -34,7 +42,11 @@ public class IOUtil {
 	
 	public static String toString(final InputStream is, String encoding) throws IOException {
 		byte[] buf = readStream(is);
-		return new String(buf, encoding);
+		try {
+			return new String(buf, encoding);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public static String getStackTrace(Throwable exc) {

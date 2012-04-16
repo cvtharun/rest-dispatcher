@@ -1,7 +1,6 @@
 package test.actors;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 import restdisp.worker.AbstractWorker;
 
@@ -11,12 +10,12 @@ public class Action extends AbstractWorker  {
 //		getResponse().getWriter().write(name + id + cardId);
 	}
 	
-	public void addUser(String name, long id, int cardId) throws IOException {
+	public void addUser(String name, long id, int cardId) {
 		System.out.println("addUser: " + name);
 		setPayload(name + id + cardId);
 	}
 	
-	public void getUser(int id) throws IOException {
+	public void getUser(int id) {
 		System.out.println("getUser: " + id);
 		setPayload("" + id, "UTF-8");
 	}
@@ -54,7 +53,7 @@ public class Action extends AbstractWorker  {
 		int a = 5 / 0;
 	}
 	
-	public void getName() throws UnsupportedEncodingException, IOException {
+	public void getName() {
 		getServletContext().getContextPath();
 		setPayload("Taro");
 	}

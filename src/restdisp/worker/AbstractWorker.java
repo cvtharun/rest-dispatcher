@@ -1,8 +1,5 @@
 package restdisp.worker;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,22 +12,30 @@ public abstract class AbstractWorker {
 	private HttpServletResponse response;
 	private ServletContext servletContext;
 	
-	public String getPayload() throws IOException {
+	public String getPayload() {
 		String encoding = request.getCharacterEncoding();
 		encoding = encoding == null ? DEF_ENCODING : encoding;
 		return getPayload(encoding);
 	}
 	
-	public String getPayload(String encoding) throws IOException {
-		return IOUtil.toString(request.getInputStream(), encoding);
+	public String getPayload(String encoding) {
+		try {
+			return IOUtil.toString(request.getInputStream(), encoding);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
-	public void setPayload(String str) throws UnsupportedEncodingException, IOException {
+	public void setPayload(String str) {
 		setPayload(str, DEF_ENCODING);
 	}
 	
-	public void setPayload(String str, String encoding) throws UnsupportedEncodingException, IOException {
-		getResponse().getOutputStream().write(str.getBytes(encoding));
+	public void setPayload(String str, String encoding) {
+		try {
+			getResponse().getOutputStream().write(str.getBytes(encoding));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public HttpServletRequest getRequest() {
