@@ -1,6 +1,7 @@
 package test.actors;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import restdisp.worker.AbstractWorker;
 
@@ -51,5 +52,10 @@ public class Action extends AbstractWorker  {
 	public void getException() throws IOException {
 		@SuppressWarnings("unused")
 		int a = 5 / 0;
+	}
+	
+	public void getName() throws UnsupportedEncodingException, IOException {
+		getServletContext().getContextPath();
+		setPayload("Taro");
 	}
 }

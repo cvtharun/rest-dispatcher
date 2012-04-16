@@ -28,10 +28,12 @@ public class ConfigParser {
 	public static void validateUrl(String url) throws ConfigurationException {
 		try {
 			String[] elems = url.split("/");
-			assertEquals(elems[0], "");
-			for (int cnt = 1; cnt < elems.length; cnt++) {
-				if (!elems[cnt].matches("^\\{.+\\}$") && !elems[cnt].matches("^(?!\\{).+(?<!\\})$")) { // if not match elems with or without braces
-					throw new ConfigurationException(String.format("Wrong value [%s]", elems[cnt]));
+			if (elems.length > 0) { // otherwise it is root "/"
+				assertEquals(elems[0], "");
+				for (int cnt = 1; cnt < elems.length; cnt++) {
+					if (!elems[cnt].matches("^\\{.+\\}$") && !elems[cnt].matches("^(?!\\{).+(?<!\\})$")) { // if not match elems with or without braces
+						throw new ConfigurationException(String.format("Wrong value [%s]", elems[cnt]));
+					}
 				}
 			}
 		} catch (ConfigurationException e) {

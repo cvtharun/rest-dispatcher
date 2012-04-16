@@ -26,12 +26,12 @@ public class DispatcherServlet extends HttpServlet {
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		String httpMethod = req.getMethod();
-		String requestUrl = req.getRequestURI();
-		
+		String requestUrl = getRelativePath(req.getRequestURI(), getServletContext().getContextPath());
+
 		UrlDescriptor urlDesc;
 		try {
 			urlDesc = LookupTree.getPath(urlTree, httpMethod, requestUrl);
-			TreeExecutor.exec(urlDesc, req, resp);
+			TreeExecutor.exec(urlDesc, req, resp, getServletContext());
 		} catch (RoutingException e) {
 			resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, String.format("Method not found [%s] [%s]", httpMethod, requestUrl));
 		} catch (HandlerException e) {
@@ -56,5 +56,12 @@ public class DispatcherServlet extends HttpServlet {
 		} catch (ConfigurationException e) {
 			throw new ServletException("Wrong configuration", e);
 		}
+	}
+	
+	private String getRelativePath(String requestURI, String contextPath) {
+		if (contextPath != null && !contextPath.isEmpty()){
+			return requestURI.replaceFirst(contextPath, "");
+		}
+		return requestURI;
 	}
 }

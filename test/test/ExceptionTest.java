@@ -3,6 +3,10 @@ package test;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import restdisp.urltree.LookupTree;
 import restdisp.urltree.Node;
 import restdisp.urltree.UrlDescriptor;
@@ -11,6 +15,9 @@ import restdisp.validation.HandlerException;
 import restdisp.validation.RoutingException;
 import restdisp.validation.ConfigurationException;
 import restdisp.worker.TreeExecutor;
+import test.mock.DispatcherServletMock;
+import test.mock.HttpServletRequestMock;
+import test.mock.HttpServletResponseMock;
 import static org.junit.Assert.*; 
 
 import org.junit.Test;
@@ -24,7 +31,7 @@ public class ExceptionTest {
 	public void testHandlerException() throws ConfigurationException, IOException, RoutingException, restdisp.validation.HandlerException {
 		try {
 			UrlDescriptor res = LookupTree.getPath(root, "get", "/svc/exc");
-			TreeExecutor.exec(res, null, null);
+			TreeExecutor.exec(res, null, null, null);
 			assertTrue(false);
 		} catch (HandlerException e) {
 			assertTrue(e.getMessage().contains("Handler invocation exception [test.actors.Action:getException]. Variables count [0]."));
@@ -134,7 +141,7 @@ public class ExceptionTest {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.abstractworkerexc.conf");
 			Node root = UrlTreeBuilder.buildUrlTree(is);
 			UrlDescriptor res = LookupTree.getPath(root, "get", "/svc/exc/1");
-			TreeExecutor.exec(res, null, null);
+			TreeExecutor.exec(res, null, null, null);
 			assertTrue(false);
 		} catch (RoutingException e) {
 			assertTrue(e.getMessage().contains("Failed to instantiate worker [test.actors.UsrAbstractWorker]"));
@@ -147,7 +154,7 @@ public class ExceptionTest {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.consworkerexc.conf");
 			Node root = UrlTreeBuilder.buildUrlTree(is);
 			UrlDescriptor res = LookupTree.getPath(root, "get", "/svc/exc/1");
-			TreeExecutor.exec(res, null, null);
+			TreeExecutor.exec(res, null, null, null);
 			assertTrue(false);
 		} catch (HandlerException e) {
 			assertTrue(e.getMessage().contains("Constructor invocation exception [test.actors.ConstructorException]"));
@@ -174,7 +181,7 @@ public class ExceptionTest {
 	public void testCastException() throws ConfigurationException, IOException, RoutingException, restdisp.validation.HandlerException {
 		try {
 			UrlDescriptor res = LookupTree.getPath(root, "get", "/svc/act/1a");
-			TreeExecutor.exec(res, null, null);
+			TreeExecutor.exec(res, null, null, null);
 			assertTrue(false);
 		} catch (Exception e) {
 			Throwable inner = e.getCause();
@@ -189,7 +196,7 @@ public class ExceptionTest {
 	public void testCastCharacterException() throws ConfigurationException, IOException, RoutingException, restdisp.validation.HandlerException {
 		try {
 			UrlDescriptor res = LookupTree.getPath(root, "get", "/svc/act/true/true/1/1/256/256/c/ss");
-			TreeExecutor.exec(res, null, null);
+			TreeExecutor.exec(res, null, null, null);
 			assertTrue(false);
 		} catch (Exception e) {
 			Throwable inner = e.getCause();
@@ -211,6 +218,57 @@ public class ExceptionTest {
 			ConfigurationException inner = (ConfigurationException) e.getCause();
 			assertTrue(e.getMessage().contains("Failed to add branch [get /svc/act test.actors.Action]"));
 			assertTrue(inner.getMessage().contains("Wrong class method entry [get /svc/act test.actors.Action]"));
+		}
+	}
+	
+	@Test
+	public void testDispatcherNoMethodError() throws IOException, ServletException {
+		HttpServletResponseMock resp = new HttpServletResponseMock();
+		DispatcherServletMock disp = new DispatcherServletMock("/web", "test/conf/router.disp.conf");
+		HttpServletRequest req = HttpServletRequestMock.buildHttpServletRequest("get","/web/svc/actERROR/123");
+		
+		disp.init();
+		disp.service(req, resp);
+		assertTrue(resp.getErrorCode() == HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+		assertEquals(resp.getError(), "Method not found [get] [/svc/actERROR/123]");
+	}
+	
+	@Test
+	public void testDispatcherExecError() throws IOException, ServletException {
+		HttpServletResponseMock resp = new HttpServletResponseMock();
+		DispatcherServletMock disp = new DispatcherServletMock("/web", "test/conf/router.disp.conf");
+		HttpServletRequest req = HttpServletRequestMock.buildHttpServletRequest("get","/web/svc/act");
+		
+		disp.init();
+		disp.service(req, resp);
+		assertTrue(resp.getErrorCode() == HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		assertTrue(resp.getError().contains("Handler invocation exception [test.actors.ActionError:exec]"));
+		assertTrue(resp.getError().contains("/ by zero"));
+	}
+	
+	@Test
+	public void testDispatcherNoConfigError() throws IOException, ServletException {
+		try {
+			DispatcherServletMock disp = new DispatcherServletMock("/web", "test/conf/noconfig.conf");
+			disp.init();
+		} catch (ServletException e) {
+			assertTrue(e.getMessage().contains("Configuration not found [test/conf/noconfig.conf]"));
+		}
+	}
+	
+	@Test
+	public void testDispatcherTreeBuildError() throws IOException, ServletException {
+		try {
+			DispatcherServletMock disp = new DispatcherServletMock("/web", "test/conf/router.exception.urlvalvalidation.conf");
+			disp.init();
+		} catch (ServletException e) {
+			ConfigurationException inner = (ConfigurationException) e.getCause();
+			ConfigurationException inner2 = (ConfigurationException) inner.getCause();
+			ConfigurationException inner3 = (ConfigurationException) inner2.getCause();
+			assertTrue(e.getMessage().contains("Wrong configuration"));
+			assertTrue(inner.getMessage().contains("Failed to add branch [get /svc/exc/{id Dummy:dummy]"));
+			assertTrue(inner2.getMessage().contains("Wrong configuration entry [/svc/exc/{id]"));
+			assertTrue(inner3.getMessage().contains("Wrong value [{id]"));
 		}
 	}
 }

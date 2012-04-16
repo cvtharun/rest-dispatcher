@@ -3,6 +3,7 @@ package restdisp.worker;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,6 +13,7 @@ public abstract class AbstractWorker {
 	public static final String DEF_ENCODING = "UTF-8";
 	private HttpServletRequest request;
 	private HttpServletResponse response;
+	private ServletContext servletContext;
 	
 	public String getPayload() throws IOException {
 		String encoding = request.getCharacterEncoding();
@@ -38,6 +40,10 @@ public abstract class AbstractWorker {
 	public HttpServletResponse getResponse() {
 		return response;
 	}
+	
+	public ServletContext getServletContext() {
+		return servletContext;
+	}
 
 	void setRequest(HttpServletRequest request) {
 		this.request = request;
@@ -45,5 +51,9 @@ public abstract class AbstractWorker {
 
 	void setResponse(HttpServletResponse response) {
 		this.response = response;
+	}
+	
+	void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
 	}
 }

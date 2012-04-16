@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,7 +14,7 @@ import restdisp.validation.RoutingException;
 import restdisp.validation.HandlerException;
 
 public class TreeExecutor {
-	public static void exec(UrlDescriptor urlDescriptior, HttpServletRequest req, HttpServletResponse rsp) throws RoutingException, HandlerException {
+	public static void exec(UrlDescriptor urlDescriptior, HttpServletRequest req, HttpServletResponse rsp, ServletContext servletContext) throws RoutingException, HandlerException {
 		List<String> urlVariables = urlDescriptior.getUrlVariables();
 		Leaf leaf = urlDescriptior.getLeaf();
 		
@@ -22,6 +23,7 @@ public class TreeExecutor {
 			abstractWorker = (AbstractWorker) leaf.getConstructor().newInstance();
 			abstractWorker.setRequest(req);
 			abstractWorker.setResponse(rsp);
+			abstractWorker.setServletContext(servletContext);
 		} catch (InstantiationException e) {
 			throw new RoutingException(String.format("Failed to instantiate worker [%s]", leaf.getCls().getName()), e);
 		} catch (IllegalAccessException e) {

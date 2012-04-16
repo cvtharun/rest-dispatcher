@@ -26,7 +26,7 @@ public class TestTree extends TestCase {
 		int i = 0;
 		while (true) {
 			res = LookupTree.getPath(root, "post", "/svc/act/1/2/3/a/b/c/d/e/4/5/6");
-			TreeExecutor.exec(res, null, null);
+			TreeExecutor.exec(res, null, null, null);
 			
 			end = System.currentTimeMillis();
 			if (end - strt > 1000) {
