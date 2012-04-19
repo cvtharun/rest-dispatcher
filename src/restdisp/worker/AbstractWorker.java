@@ -4,7 +4,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import restdisp.io.IOUtil;
+import restdisp.io.IOUtils;
 
 public abstract class AbstractWorker {
 	public static final String DEF_ENCODING = "UTF-8";
@@ -20,7 +20,7 @@ public abstract class AbstractWorker {
 	
 	public String getPayload(String encoding) {
 		try {
-			return IOUtil.toString(request.getInputStream(), encoding);
+			return IOUtils.toString(request.getInputStream(), encoding);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

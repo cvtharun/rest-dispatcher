@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import restdisp.io.IOUtil;
+import restdisp.io.IOUtils;
 import restdisp.validation.ConfigParser;
 import restdisp.validation.ConfigurationException;
 
@@ -15,7 +15,7 @@ public class UrlTreeBuilder {
 	public static Node buildUrlTree(InputStream is) throws ConfigurationException {
 		String confString = null;
 		try {
-			confString = IOUtil.toString(is);
+			confString = IOUtils.toString(is);
 		} catch (IOException e) {
 			throw new ConfigurationException("Could not read stream", e);
 		}

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import restdisp.io.IOUtil;
+import restdisp.io.IOUtils;
 import restdisp.urltree.UrlDescriptor;
 import restdisp.urltree.LookupTree;
 import restdisp.urltree.Node;
@@ -35,7 +35,7 @@ public class DispatcherServlet extends HttpServlet {
 		} catch (RoutingException e) {
 			resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, String.format("Method not found [%s] [%s]", httpMethod, requestUrl));
 		} catch (HandlerException e) {
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, IOUtil.getStackTrace(e));
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, IOUtils.getStackTrace(e));
 		}
 	}
 	
@@ -55,6 +55,12 @@ public class DispatcherServlet extends HttpServlet {
 			urlTree = UrlTreeBuilder.buildUrlTree(is);
 		} catch (ConfigurationException e) {
 			throw new ServletException("Wrong configuration", e);
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 	
