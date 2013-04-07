@@ -24,7 +24,7 @@ import org.junit.Test;
 
 public class ExceptionTest {
 	private InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.conf");
-	private Node root = UrlTreeBuilder.buildUrlTree(is);
+	private Node root = new UrlTreeBuilder().buildUrlTree(is);
 	public ExceptionTest() throws Exception {}
 	
 	@Test
@@ -54,7 +54,7 @@ public class ExceptionTest {
 	public void testConfigurationExceptionBranch() throws ConfigurationException, IOException {
 		try {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.branch.conf");
-			Node root = UrlTreeBuilder.buildUrlTree(is);
+			Node root = new UrlTreeBuilder().buildUrlTree(is);
 			assertTrue(false);
 		} catch (ConfigurationException e) {
 			Throwable inner = e.getCause();
@@ -68,7 +68,7 @@ public class ExceptionTest {
 	public void testConfigurationExceptionMethod() throws ConfigurationException, IOException {
 		try {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.method.conf");
-			Node root = UrlTreeBuilder.buildUrlTree(is);
+			Node root = new UrlTreeBuilder().buildUrlTree(is);
 			assertTrue(false);
 		} catch (ConfigurationException e) {
 			Throwable inner = e.getCause();
@@ -82,7 +82,7 @@ public class ExceptionTest {
 	public void testConfigurationExceptionGenMethod() throws ConfigurationException, IOException {
 		try {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.genericmethod.conf");
-			Node root = UrlTreeBuilder.buildUrlTree(is);
+			Node root = new UrlTreeBuilder().buildUrlTree(is);
 			assertTrue(false);
 		} catch (ConfigurationException e) {
 			Throwable inner = e.getCause();
@@ -96,7 +96,7 @@ public class ExceptionTest {
 	public void testConfigurationGenClassException() throws ConfigurationException, IOException {
 		try {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.genericclass.conf");
-			Node root = UrlTreeBuilder.buildUrlTree(is);
+			Node root = new UrlTreeBuilder().buildUrlTree(is);
 			assertTrue(false);
 		} catch (ConfigurationException e) {
 			Throwable inner = e.getCause();
@@ -110,7 +110,7 @@ public class ExceptionTest {
 	public void testMethodValiationException() throws ConfigurationException, IOException {
 		try {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.methodvalidation.conf");
-			Node root = UrlTreeBuilder.buildUrlTree(is);
+			Node root = new UrlTreeBuilder().buildUrlTree(is);
 			assertTrue(false);
 		} catch (ConfigurationException e) {
 			Throwable inner = e.getCause();
@@ -124,7 +124,7 @@ public class ExceptionTest {
 	public void testUrlValValiationException() throws ConfigurationException, IOException {
 		try {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.urlvalvalidation.conf");
-			Node root = UrlTreeBuilder.buildUrlTree(is);
+			Node root = new UrlTreeBuilder().buildUrlTree(is);
 			assertTrue(false);
 		} catch (ConfigurationException e) {
 			Throwable inner = e.getCause();
@@ -139,12 +139,12 @@ public class ExceptionTest {
 	public void testAbstractWorkerException() throws ConfigurationException, IOException, RoutingException, HandlerException {
 		try {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.abstractworkerexc.conf");
-			Node root = UrlTreeBuilder.buildUrlTree(is);
+			Node root = new UrlTreeBuilder().buildUrlTree(is);
 			UrlDescriptor res = LookupTree.getPath(root, "get", "/svc/exc/1");
 			TreeExecutor.exec(res, null, null, null);
 			assertTrue(false);
-		} catch (RoutingException e) {
-			assertTrue(e.getMessage().contains("Failed to instantiate worker [test.actors.UsrAbstractWorker]"));
+		} catch (ConfigurationException e) {
+			assertTrue(e.getMessage().contains("Failed to add branch [get /svc/exc/{id} test.actors.UsrAbstractWorker:exec]"));
 		}
 	}
 	
@@ -152,12 +152,12 @@ public class ExceptionTest {
 	public void testAbstractConstructorException() throws ConfigurationException, IOException, RoutingException, HandlerException {
 		try {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.consworkerexc.conf");
-			Node root = UrlTreeBuilder.buildUrlTree(is);
+			Node root = new UrlTreeBuilder().buildUrlTree(is);
 			UrlDescriptor res = LookupTree.getPath(root, "get", "/svc/exc/1");
 			TreeExecutor.exec(res, null, null, null);
 			assertTrue(false);
-		} catch (HandlerException e) {
-			assertTrue(e.getMessage().contains("Constructor invocation exception [test.actors.ConstructorException]"));
+		} catch (ConfigurationException e) {
+			assertTrue(e.getMessage().contains("Failed to add branch [get /svc/exc/{id} test.actors.ConstructorException:exec]"));
 		}
 	}
 	
@@ -166,7 +166,7 @@ public class ExceptionTest {
 		try {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.wrongargs.conf");
 			@SuppressWarnings("unused")
-			Node root = UrlTreeBuilder.buildUrlTree(is);
+			Node root = new UrlTreeBuilder().buildUrlTree(is);
 			assertTrue(false);
 		} catch (ConfigurationException e) {
 			Throwable inner = e.getCause();
@@ -212,7 +212,7 @@ public class ExceptionTest {
 		try {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.exception.wrongworkermethod.conf");
 			@SuppressWarnings("unused")
-			Node root = UrlTreeBuilder.buildUrlTree(is);
+			Node root = new UrlTreeBuilder().buildUrlTree(is);
 			assertTrue(false);
 		} catch (ConfigurationException e) {
 			ConfigurationException inner = (ConfigurationException) e.getCause();
@@ -278,7 +278,7 @@ public class ExceptionTest {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.conf");
 			is.close();
 			@SuppressWarnings("unused")
-			Node root = UrlTreeBuilder.buildUrlTree(is);
+			Node root = new UrlTreeBuilder().buildUrlTree(is);
 			assertTrue(false);
 		} catch (ConfigurationException e) {
 			assertTrue(e.getMessage().contains("Could not read stream"));

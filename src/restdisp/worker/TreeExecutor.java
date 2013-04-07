@@ -18,19 +18,10 @@ public class TreeExecutor {
 		List<String> urlVariables = urlDescriptior.getUrlVariables();
 		Leaf leaf = urlDescriptior.getLeaf();
 		
-		AbstractWorker abstractWorker;
-		try {
-			abstractWorker = (AbstractWorker) leaf.getConstructor().newInstance();
-			abstractWorker.setRequest(req);
-			abstractWorker.setResponse(rsp);
-			abstractWorker.setServletContext(servletContext);
-		} catch (InstantiationException e) {
-			throw new RoutingException(String.format("Failed to instantiate worker [%s]", leaf.getCls().getName()), e);
-		} catch (IllegalAccessException e) {
-			throw new RoutingException(String.format("Illegal acces to worker [%s]", leaf.getCls().getName()), e);
-		} catch (InvocationTargetException e) {
-			throw new HandlerException(String.format("Constructor invocation exception [%s]", leaf.getCls().getName()), e);
-		}
+		AbstractWorker abstractWorker = leaf.getAbstractWorker();
+		abstractWorker.setRequest(req);
+		abstractWorker.setResponse(rsp);
+		abstractWorker.setServletContext(servletContext);
 		
 		Object[] vars;
 		try {

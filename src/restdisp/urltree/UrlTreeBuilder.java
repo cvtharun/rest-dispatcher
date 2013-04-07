@@ -3,16 +3,23 @@ package restdisp.urltree;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import restdisp.io.IOUtils;
 import restdisp.validation.ConfigParser;
 import restdisp.validation.ConfigurationException;
+import restdisp.worker.AbstractWorker;
 
 public class UrlTreeBuilder {
-	public static Node buildUrlTree(InputStream is) throws ConfigurationException {
+	private final Map<String, AbstractWorker> workerMap = new HashMap<String, AbstractWorker>();
+	private final Map<String, Class<AbstractWorker>> workerClassMap = new HashMap<String, Class<AbstractWorker>>();
+	
+	public Node buildUrlTree(InputStream is) throws ConfigurationException {
 		String confString = null;
 		try {
 			confString = IOUtils.toString(is);
@@ -30,7 +37,7 @@ public class UrlTreeBuilder {
 		return root;
 	}
 	
-	private static void addEntryToTree(Node root, String entry) throws ConfigurationException {
+	private void addEntryToTree(Node root, String entry) throws ConfigurationException {
 		String[] items = entry.split(" ");
 		try {
 			if (items.length != 3) {
@@ -53,7 +60,7 @@ public class UrlTreeBuilder {
 		}
 	}
 
-	private static void addBranchToTree(Node root, String[] nodes, String[] classAndMethodArr) throws ConfigurationException {
+	private void addBranchToTree(Node root, String[] nodes, String[] classAndMethodArr) throws ConfigurationException {
 		List<Node> children = root.getChildren();
 		i: for (int i = 0; i < nodes.length; i++) {
 			Node tmpNode = new Node(getVarname(nodes[i]));
@@ -80,21 +87,37 @@ public class UrlTreeBuilder {
 		}
 	}
 	
-	private static Leaf buildLeaf(String[] classAndMethodArr, String[] nodes) throws ConfigurationException {
+	@SuppressWarnings("unchecked")
+	private Leaf buildLeaf(String[] classAndMethodArr, String[] nodes) throws ConfigurationException {
+		String className = classAndMethodArr[0];
 		try {
-			Class<?> cls = Class.forName(classAndMethodArr[0]);
-			Constructor<?> constructor = cls.getConstructor();
+			AbstractWorker worker = workerMap.get(className);
+			Class<AbstractWorker> cls = workerClassMap.get(className);
+			
+			if (worker == null) {
+				cls = (Class<AbstractWorker>) Class.forName(className);
+				Constructor<AbstractWorker> constructor = cls.getConstructor();
+				worker = constructor.newInstance();
+				workerMap.put(className, worker);
+				workerClassMap.put(className, cls);
+			}
 			int varCnt = getVariableCount(nodes);
 			Method meth = getMethod(cls, classAndMethodArr[1], varCnt);
-			return new Leaf(cls, constructor, meth, Casters.getCasters(meth));
+			return new Leaf(cls, worker, meth, Casters.getCasters(meth));
 		} catch (ClassNotFoundException e) {
 			throw new ConfigurationException(String.format("Failed to build leaf. Class not found [%s].", classAndMethodArr[0]), e);
 		} catch (NoSuchMethodException e) {
 			throw new ConfigurationException(String.format("Failed to build leaf. Default constructor not found [%s].", classAndMethodArr[0]), e);
+		} catch (InstantiationException e) {
+			throw new ConfigurationException(String.format("Failed to instantiate worker [%s]", className), e);
+		} catch (IllegalAccessException e) {
+			throw new ConfigurationException(String.format("Illegal acces to worker [%s]",className), e);
+		} catch (InvocationTargetException e) {
+			throw new ConfigurationException(String.format("Constructor invocation exception [%s]", className), e);
 		}
 	}
 	
-	private static int getVariableCount(String[] nodes) {
+	private int getVariableCount(String[] nodes) {
 		int cnt = 0;
 		for (String str : nodes) {
 			if (str.charAt(0) == '{'){
@@ -104,7 +127,7 @@ public class UrlTreeBuilder {
 		return cnt;
 	}
 	
-	private static Method getMethod(Class<?> cls, String methodName, int varCnt) throws ConfigurationException {
+	private Method getMethod(Class<?> cls, String methodName, int varCnt) throws ConfigurationException {
 		Method meth = null;
 		Method[] mths = cls.getMethods();
 		for (Method curMet : mths) {
@@ -127,11 +150,11 @@ public class UrlTreeBuilder {
 		return meth;
 	}
 
-	private static boolean isVar(String url) {
+	private boolean isVar(String url) {
 		return url.contains("{") || url.contains("}"); 
 	}
 	
-	private static String getVarname(String url) {
+	private String getVarname(String url) {
 		return url.replaceAll("\\{|\\}", "");
 	}
 }

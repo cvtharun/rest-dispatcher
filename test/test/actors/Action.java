@@ -11,6 +11,7 @@ public class Action extends AbstractWorker  {
 	}
 	
 	public void addUser(String name, long id, int cardId) {
+		getRequest().getContentLength();
 		System.out.println("addUser: " + name);
 		setPayload(name + id + cardId);
 	}

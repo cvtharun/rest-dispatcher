@@ -1,9 +1,6 @@
 package test;
 
-import static org.easymock.EasyMock.createStrictMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,12 +25,18 @@ import test.mock.HttpServletResponseMock;
 public class BasicTest extends TestCase {
 	public void testLookup() throws IOException, RoutingException, HandlerException, ConfigurationException {
 		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.conf");
-		Node root = UrlTreeBuilder.buildUrlTree(is);
+		Node root = new UrlTreeBuilder().buildUrlTree(is);
+		
+		HttpServletRequest httpServletRequestMock = createMock(HttpServletRequest.class);
+		expect(httpServletRequestMock.getContentLength()).andReturn(1);
+		replay(httpServletRequestMock);
 		
 		HttpServletResponseMock mock = new HttpServletResponseMock();
 		UrlDescriptor res = LookupTree.getPath(root, "post", "/svc/act/Tarokun/1/2");
-		TreeExecutor.exec(res, null, mock, null);
+		TreeExecutor.exec(res, httpServletRequestMock, mock, null);
 		assertEquals("Tarokun12", mock.getResult());
+		
+		verify(httpServletRequestMock);
 		
 		mock = new HttpServletResponseMock();
 		res = LookupTree.getPath(root, "get", "/svc/act/123");
@@ -68,7 +71,7 @@ public class BasicTest extends TestCase {
 	
 	public void testRootPath() throws IOException, RoutingException, HandlerException, ConfigurationException {
 		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.rootpath.conf");
-		Node root = UrlTreeBuilder.buildUrlTree(is);
+		Node root = new UrlTreeBuilder().buildUrlTree(is);
 		
 		HttpServletResponseMock mock = null;
 		UrlDescriptor res = null;

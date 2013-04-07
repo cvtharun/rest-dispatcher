@@ -17,7 +17,7 @@ import restdisp.worker.TreeExecutor;
 public class TestTree extends TestCase {
 	public void testTree() throws IOException, SecurityException, ClassNotFoundException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, ConfigurationException, RoutingException, HandlerException, InterruptedException {
 		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.conf");
-		Node root = UrlTreeBuilder.buildUrlTree(is);
+		Node root = new UrlTreeBuilder().buildUrlTree(is);
 		
 		UrlDescriptor res = null;
 		long strt = System.currentTimeMillis();

@@ -52,7 +52,7 @@ public class DispatcherServlet extends HttpServlet {
 		}
 		
 		try {
-			urlTree = UrlTreeBuilder.buildUrlTree(is);
+			urlTree = new UrlTreeBuilder().buildUrlTree(is);
 		} catch (ConfigurationException e) {
 			throw new ServletException("Wrong configuration", e);
 		} finally {

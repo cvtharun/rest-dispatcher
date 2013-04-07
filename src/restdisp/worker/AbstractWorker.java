@@ -8,19 +8,19 @@ import restdisp.io.IOUtils;
 
 public abstract class AbstractWorker {
 	public static final String DEF_ENCODING = "UTF-8";
-	private HttpServletRequest request;
-	private HttpServletResponse response;
-	private ServletContext servletContext;
+	private final ThreadLocal<HttpServletRequest> request = new  ThreadLocal<HttpServletRequest>();
+	private final ThreadLocal<HttpServletResponse> response = new  ThreadLocal<HttpServletResponse>();
+	private final ThreadLocal<ServletContext> servletContext = new  ThreadLocal<ServletContext>();
 	
 	public String getPayload() {
-		String encoding = request.getCharacterEncoding();
+		String encoding = request.get().getCharacterEncoding();
 		encoding = encoding == null ? DEF_ENCODING : encoding;
 		return getPayload(encoding);
 	}
 	
 	public String getPayload(String encoding) {
 		try {
-			return IOUtils.toString(request.getInputStream(), encoding);
+			return IOUtils.toString(request.get().getInputStream(), encoding);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -39,26 +39,26 @@ public abstract class AbstractWorker {
 	}
 	
 	public HttpServletRequest getRequest() {
-		return request;
+		return request.get();
 	}
 	
 	public HttpServletResponse getResponse() {
-		return response;
+		return response.get();
 	}
 	
 	public ServletContext getServletContext() {
-		return servletContext;
+		return servletContext.get();
 	}
 
 	void setRequest(HttpServletRequest request) {
-		this.request = request;
+		this.request.set(request);
 	}
 
 	void setResponse(HttpServletResponse response) {
-		this.response = response;
+		this.response.set(response);
 	}
 	
 	void setServletContext(ServletContext servletContext) {
-		this.servletContext = servletContext;
+		this.servletContext.set(servletContext);
 	}
 }
