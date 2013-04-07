@@ -25,7 +25,7 @@ import test.mock.HttpServletResponseMock;
 public class BasicTest extends TestCase {
 	public void testLookup() throws IOException, RoutingException, HandlerException, ConfigurationException {
 		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.conf");
-		Node root = new UrlTreeBuilder().buildUrlTree(is);
+		Node root = new UrlTreeBuilder(null).buildUrlTree(is);
 		
 		HttpServletRequest httpServletRequestMock = createMock(HttpServletRequest.class);
 		expect(httpServletRequestMock.getContentLength()).andReturn(1);
@@ -33,57 +33,57 @@ public class BasicTest extends TestCase {
 		
 		HttpServletResponseMock mock = new HttpServletResponseMock();
 		UrlDescriptor res = LookupTree.getPath(root, "post", "/svc/act/Tarokun/1/2");
-		TreeExecutor.exec(res, httpServletRequestMock, mock, null);
+		new TreeExecutor().exec(res, httpServletRequestMock, mock, null);
 		assertEquals("Tarokun12", mock.getResult());
 		
 		verify(httpServletRequestMock);
 		
 		mock = new HttpServletResponseMock();
 		res = LookupTree.getPath(root, "get", "/svc/act/123");
-		TreeExecutor.exec(res, null, mock, null);
+		new TreeExecutor().exec(res, null, mock, null);
 		assertEquals("123", mock.getResult());
 		
 		mock = new HttpServletResponseMock();
 		res = LookupTree.getPath(root, "delete", "/svc/act/567");
-		TreeExecutor.exec(res, null, mock, null);
+		new TreeExecutor().exec(res, null, mock, null);
 		assertEquals("567", mock.getResult());
 		
 		mock = new HttpServletResponseMock();
 		res = LookupTree.getPath(root, "get", "/svc/act");
-		TreeExecutor.exec(res, null, mock, null);
+		new TreeExecutor().exec(res, null, mock, null);
 		assertEquals("dummy", mock.getResult());
 		
 		mock = new HttpServletResponseMock();
 		res = LookupTree.getPath(root, "get", "/svc/act/1.1/1.2/1.3/1.4");
-		TreeExecutor.exec(res, null, mock, null);
+		new TreeExecutor().exec(res, null, mock, null);
 		assertEquals("fp5", mock.getResult());
 		
 		mock = new HttpServletResponseMock();
 		res = LookupTree.getPath(root, "get", "/svc/act/true/true/1/1/256/256/c/s");
-		TreeExecutor.exec(res, null, mock, null);
+		new TreeExecutor().exec(res, null, mock, null);
 		assertEquals("sttruetrue11256256cs", mock.getResult());
 		
 		mock = new HttpServletResponseMock();
 		res = LookupTree.getPath(root, "get", "/svc/act/lt/1/2/3/4");
-		TreeExecutor.exec(res, null, mock, null);
+		new TreeExecutor().exec(res, null, mock, null);
 		assertEquals("lt1234", mock.getResult());
 	}
 	
 	public void testRootPath() throws IOException, RoutingException, HandlerException, ConfigurationException {
 		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.rootpath.conf");
-		Node root = new UrlTreeBuilder().buildUrlTree(is);
+		Node root = new UrlTreeBuilder(null).buildUrlTree(is);
 		
 		HttpServletResponseMock mock = null;
 		UrlDescriptor res = null;
 		
 		mock = new HttpServletResponseMock();
 		res = LookupTree.getPath(root, "get", "/");
-		TreeExecutor.exec(res, null, mock, null);
+		new TreeExecutor().exec(res, null, mock, null);
 		assertEquals("dummy", mock.getResult());
 		
 		mock = new HttpServletResponseMock();
 		res = LookupTree.getPath(root, "get", "/123");
-		TreeExecutor.exec(res, null, mock, null);
+		new TreeExecutor().exec(res, null, mock, null);
 		assertEquals("123", mock.getResult());
 	}
 	

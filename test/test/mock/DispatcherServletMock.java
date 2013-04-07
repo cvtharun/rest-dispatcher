@@ -15,6 +15,8 @@ public class DispatcherServletMock extends DispatcherServlet {
 	private String initParameter;
 	private ServletContext servletContext;
 	
+	private int callCnt = 0;
+	
 	public DispatcherServletMock(String servletContext, String initParameter) {
 		this.contextPath = servletContext;
 		this.initParameter = initParameter;
@@ -25,6 +27,11 @@ public class DispatcherServletMock extends DispatcherServlet {
 	}
 
 	public ServletContext getServletContext() {
+		if (callCnt == 0) {
+			callCnt++;
+			return null;
+		}
+		
 		if (servletContext != null) 
 			return servletContext;
 		

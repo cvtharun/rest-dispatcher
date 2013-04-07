@@ -10,14 +10,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
 import restdisp.io.IOUtils;
 import restdisp.validation.ConfigParser;
 import restdisp.validation.ConfigurationException;
 import restdisp.worker.AbstractWorker;
 
 public class UrlTreeBuilder {
+	private final WebApplicationContext webAppContext;
 	private final Map<String, AbstractWorker> workerMap = new HashMap<String, AbstractWorker>();
 	private final Map<String, Class<AbstractWorker>> workerClassMap = new HashMap<String, Class<AbstractWorker>>();
+	
+	public UrlTreeBuilder(ServletContext servletContext) {
+		if (servletContext != null) {
+			webAppContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+		} else {
+			webAppContext = null;
+		}
+	}
 	
 	public Node buildUrlTree(InputStream is) throws ConfigurationException {
 		String confString = null;
@@ -93,17 +107,25 @@ public class UrlTreeBuilder {
 		try {
 			AbstractWorker worker = workerMap.get(className);
 			Class<AbstractWorker> cls = workerClassMap.get(className);
-			
 			if (worker == null) {
-				cls = (Class<AbstractWorker>) Class.forName(className);
-				Constructor<AbstractWorker> constructor = cls.getConstructor();
-				worker = constructor.newInstance();
-				workerMap.put(className, worker);
-				workerClassMap.put(className, cls);
+				if (webAppContext != null && webAppContext.containsBean(className)) {
+					Object workerBean = webAppContext.getBean(className);
+					if (!(workerBean instanceof AbstractWorker)) {
+						throw new ConfigurationException(String.format("Spring bean is not istance of [%s]", AbstractWorker.class.getName()));
+					}
+					worker = (AbstractWorker) workerBean;
+					cls = (Class<AbstractWorker>) worker.getClass();
+				} else {
+					cls = (Class<AbstractWorker>) Class.forName(className);
+					Constructor<AbstractWorker> constructor = cls.getConstructor();
+					worker = constructor.newInstance();
+					workerMap.put(className, worker);
+					workerClassMap.put(className, cls);
+				}
 			}
 			int varCnt = getVariableCount(nodes);
 			Method meth = getMethod(cls, classAndMethodArr[1], varCnt);
-			return new Leaf(cls, worker, meth, Casters.getCasters(meth));
+			return new Leaf(worker, meth, Casters.getCasters(meth));
 		} catch (ClassNotFoundException e) {
 			throw new ConfigurationException(String.format("Failed to build leaf. Class not found [%s].", classAndMethodArr[0]), e);
 		} catch (NoSuchMethodException e) {

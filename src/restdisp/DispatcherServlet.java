@@ -21,8 +21,9 @@ import restdisp.worker.TreeExecutor;
 
 public class DispatcherServlet extends HttpServlet {
 	private static final long serialVersionUID = -8158617186009563920L;
-	private static Node urlTree;
-
+	private Node urlTree;
+	private final TreeExecutor treeExecutor = new TreeExecutor();
+	
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		String httpMethod = req.getMethod();
@@ -31,7 +32,7 @@ public class DispatcherServlet extends HttpServlet {
 		UrlDescriptor urlDesc;
 		try {
 			urlDesc = LookupTree.getPath(urlTree, httpMethod, requestUrl);
-			TreeExecutor.exec(urlDesc, req, resp, getServletContext());
+			treeExecutor.exec(urlDesc, req, resp, getServletContext());
 		} catch (RoutingException e) {
 			resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, String.format("Method not found [%s] [%s]", httpMethod, requestUrl));
 		} catch (HandlerException e) {
@@ -52,7 +53,7 @@ public class DispatcherServlet extends HttpServlet {
 		}
 		
 		try {
-			urlTree = new UrlTreeBuilder().buildUrlTree(is);
+			urlTree = new UrlTreeBuilder(getServletContext()).buildUrlTree(is);
 		} catch (ConfigurationException e) {
 			throw new ServletException("Wrong configuration", e);
 		} finally {

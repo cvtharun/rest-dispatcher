@@ -14,7 +14,7 @@ import restdisp.validation.RoutingException;
 import restdisp.validation.HandlerException;
 
 public class TreeExecutor {
-	public static void exec(UrlDescriptor urlDescriptior, HttpServletRequest req, HttpServletResponse rsp, ServletContext servletContext) throws RoutingException, HandlerException {
+	public void exec(UrlDescriptor urlDescriptior, HttpServletRequest req, HttpServletResponse rsp, ServletContext servletContext) throws RoutingException, HandlerException {
 		List<String> urlVariables = urlDescriptior.getUrlVariables();
 		Leaf leaf = urlDescriptior.getLeaf();
 		
@@ -38,7 +38,7 @@ public class TreeExecutor {
 		}
 	}
 	
-	private static Object[] getVariables(List<String> list, Method meth, ArgCaster[] casters) throws RoutingException {
+	private Object[] getVariables(List<String> list, Method meth, ArgCaster[] casters) throws RoutingException {
 		if (null == list) {
 			return new Object[0];
 		}

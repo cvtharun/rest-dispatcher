@@ -6,13 +6,11 @@ import restdisp.worker.AbstractWorker;
 import restdisp.worker.ArgCaster;
 
 public class Leaf {
-	private final Class<?> cls;
 	private final AbstractWorker abstractWorker;
 	private final Method meth;
 	private final ArgCaster[] casters;
 	
-	public Leaf(Class<?> cls, AbstractWorker abstractWorker, Method meth, ArgCaster[] casters) {
-		this.cls = cls;
+	public Leaf(AbstractWorker abstractWorker, Method meth, ArgCaster[] casters) {
 		this.abstractWorker = abstractWorker;
 		this.meth = meth;
 		this.casters = casters;
@@ -23,7 +21,7 @@ public class Leaf {
 	}
 
 	public Class<?> getCls() {
-		return cls;
+		return abstractWorker.getClass();
 	}
 
 	public Method getMeth() {

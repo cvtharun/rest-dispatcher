@@ -17,7 +17,7 @@ import restdisp.worker.TreeExecutor;
 public class TestTree extends TestCase {
 	public void testTree() throws IOException, SecurityException, ClassNotFoundException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, ConfigurationException, RoutingException, HandlerException, InterruptedException {
 		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/conf/router.conf");
-		Node root = new UrlTreeBuilder().buildUrlTree(is);
+		Node root = new UrlTreeBuilder(null).buildUrlTree(is);
 		
 		UrlDescriptor res = null;
 		long strt = System.currentTimeMillis();
@@ -26,7 +26,7 @@ public class TestTree extends TestCase {
 		int i = 0;
 		while (true) {
 			res = LookupTree.getPath(root, "post", "/svc/act/1/2/3/a/b/c/d/e/4/5/6");
-			TreeExecutor.exec(res, null, null, null);
+			new TreeExecutor().exec(res, null, null, null);
 			
 			end = System.currentTimeMillis();
 			if (end - strt > 1000) {
