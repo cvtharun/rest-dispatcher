@@ -6,10 +6,19 @@ The project goal is to provide simple way to define REST services via single poi
 ### Getting Started to build REST service
 To build REST service using rest-dispatcher you need following:
 
-1. Add restdisp.jar to classpath 
-2. Implement custom handler by extending restdisp.worker.AbstractWorker:
+1. Clone and install to local maven repository
 
-		package example;		
+		git clone https://github.com/alexd84/rest-dispatcher
+		mvn clean install
+2. Add dependency to your project
+
+		<dependency>
+			<groupId>com.restdisp</groupId>
+			<artifactId>restdisp</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+3. Implement custom handler by extending restdisp.worker.AbstractWorker:
+	
 		import java.io.IOException;		
 		import restdisp.worker.AbstractWorker;		
 
@@ -24,12 +33,12 @@ To build REST service using rest-dispatcher you need following:
 				setPayload("User saved with id: 5");		
 			}		
 		}	
-3. Define usergateway.config and add it to classpath:
+4. Define usergateway.config and add it to classpath:
 
 		# usergateway.config		
-		get        /srv/user/{id}        example.UserGateway:getUser		
-		post       /srv/user/{id}        example.UserGateway:saveUser		
-4. Add dispatcher servlet configuration to web.xml 
+		get        /user/{id}        example.UserGateway:getUser		
+		post       /user/{id}        example.UserGateway:saveUser		
+5. Add dispatcher servlet configuration to web.xml 
 
 		<servlet>
 		        <servlet-name>dispatcher</servlet-name>
@@ -42,5 +51,5 @@ To build REST service using rest-dispatcher you need following:
 		</servlet>
 		<servlet-mapping>
 		        <servlet-name>dispatcher</servlet-name>
-		        <url-pattern>/srv/*</url-pattern>
+		        <url-pattern>/*</url-pattern>
 		</servlet-mapping>
