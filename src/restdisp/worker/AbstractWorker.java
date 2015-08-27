@@ -26,6 +26,29 @@ public abstract class AbstractWorker {
 		}
 	}
 	
+	public void setPayloadJson(Object object) {
+		getResponse().setContentType("application/json");
+		 ObjectMapper mapper = new ObjectMapper();
+	         mapper.setSerializationInclusion(Inclusion.NON_NULL);
+	         String str="";
+		try {
+			str = mapper.writeValueAsString(object);
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	         setPayload(str, DEF_ENCODING);
+	}
+	
+	public void setPayloadXml(Object object) {
+		getResponse().setContentType("application/xml");
+		String str=convertToXml(object, object.getClass());
+		setPayload(str, DEF_ENCODING);
+	}
+	
 	public void setPayload(String str) {
 		setPayload(str, DEF_ENCODING);
 	}
@@ -37,6 +60,21 @@ public abstract class AbstractWorker {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	private String convertToXml(Object source, Class... type) {
+        String result;
+        StringWriter sw = new StringWriter();
+        try {
+            JAXBContext carContext = JAXBContext.newInstance(type);
+            Marshaller carMarshaller = carContext.createMarshaller();
+            carMarshaller.marshal(source, sw);
+            result = sw.toString();
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+
+        return result;
+    	}
 	
 	public HttpServletRequest getRequest() {
 		return request.get();
